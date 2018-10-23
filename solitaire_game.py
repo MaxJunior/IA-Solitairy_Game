@@ -204,49 +204,88 @@ def board_perform_move(board: Board, move: Move) -> Board:
     else :
         return board_copy
 
+def find_content_type_pos(board: Board, content: Content ) -> List[Move]:
+    """ given a board an content type: return a list of positions 
+       of the content type in the board """
+    board_lines = board_n_lines(board)
+    board_columns = board_n_columns(board)
+    
+    positions= []
+    
+    for line in range(board_lines):
+        for column in range(board_columns):
+            curr_pos = make_pos(line,column)
+            if get_content(board, curr_pos) == content:
+                positions.append(curr_pos)
+    return positions
+
+def board_content_type_amount(board: Board, content:Content)-> int:
+    """ given a board and an content type : return the amount of content type in the
+      board """
+    amount = len(find_content_type_pos(board,content))
+    
+    return amount
+
+def find_content_pos(board: Board, content: Content) -> List[Pos]:
+    
+    lines = range(0, board_n_lines(board))
+    columns = range(0, board_n_columns(board))
+    
+    positions = [ (l,c) for l in lines for c in columns if get_content(board,make_pos(l,c)) == content]
+    
+    return positions
 
 
 
-class Sol_State:
+class sol_state:
 
-    def __init__(self, board):
+    def __init__(self, board: Board, action: Move = None, h_value: float= 0) -> None:
         self.board = board
+        self.action = action
+        self.moves = board_moves(board)
+        self.h_value = h_value
 
-    def __lt__(self, other):
+    def __lt__(self, other_state: sol_state) -> bool:
+        if self.h_value != other_state.h_value:
+            return self.h_value < other_state.h_value
+        
+        return len(self.moves) > len(other_state.moves)
 
-    def getBoard():
-        return self.board
 
 
+class solitaire(Problem):
 
-
-class Solitaire(Problem):
-
-    def __init__(self, board):
-        self.initial = Sol_State(board)
+    def __init__(self, board) -> None:
+        super().__init__(sg_state(board))
 
     """ Given a state returns a list of actions applicable to that state
     In this specific case the possible board_moves """
-    def actions(self, state):
-            return board_moves(state.getBoard())
+    def actions(self, state : sol_state) -> List[Move] :
+            return  [ move for move in state.moves if len(moves) >= 2]
 
     """ Given a state and an action returns the state resultant
     of applying the action to the intial state """
-    def result(self, state, action):
-        board = state.getBoard()
-        new_board = board_perform_move(board, action)
-        return Sol_State(new_board)
+    def result(self, state: sol_state, action: Move) -> sol_state:
+        new_board = board_perform_move(state.board, action)
+        return sol_state(new_board)
 
-    """ Verefies if state is a solution (nº of pieces in board = 1) """
-    def goal_test(self, state):
-        board = state.getBoard()
-        return(count_pieces(board)==1 )
+    """ Verifies if state is a solution (nº of pieces "O" in board == 1) """
+    def goal_test(self, state: sol_state, action :Move) -> bool:    
+        return board_content_type_amount(state.board, "O" ) == 1
 
 
     """ c-cost to this state / s1 - initial state
         s2 - final state  after action """
-    def path_cost(self, c , s1, action, s2):
-        return c+1
+    def path_cost(self, c: int, state1: sg_state, action: Move, state2: sol_state) -> float:
+        return  cost_n_moves(c)  
 
     def h(self, node):
         node.state
+
+#
+def cost_n_moves(prev_cost: int, weight: int = 1) -> int:
+    """ 'g(n)' cost  function that adds a 'weight' to each move."""
+    return prev_cost + weight
+#______________________________________________________________________________
+# aux functions
+        
