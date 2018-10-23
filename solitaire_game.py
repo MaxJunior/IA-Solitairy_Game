@@ -7,6 +7,7 @@ Maxwell Junior - 79457
 
 """
 from typing import List, Tuple
+from search import Problem
 #________________________________________________________
 # Types Annotations
 
@@ -271,7 +272,7 @@ class solitaire(Problem):
 
     """ Verifies if state is a solution (nº of pieces "O" in board == 1) """
     def goal_test(self, state: sol_state, action :Move) -> bool:    
-        return board_content_type_amount(state.board, "O" ) == 1
+        return board_content_type_amount(state.board, c_peg() ) == 1
 
 
     """ c-cost to this state / s1 - initial state
