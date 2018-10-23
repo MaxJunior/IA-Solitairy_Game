@@ -7,7 +7,7 @@ Maxwell Junior - 79457
 
 """
 from typing import List, Tuple
-from search import Problem
+from search import Node, Problem
 #________________________________________________________
 # Types Annotations
 
@@ -271,7 +271,7 @@ class solitaire(Problem):
         return sol_state(new_board)
 
     """ Verifies if state is a solution (nº of pieces "O" in board == 1) """
-    def goal_test(self, state: sol_state, action :Move) -> bool:    
+    def goal_test(self, state: sol_state) -> bool:    
         return board_content_type_amount(state.board, c_peg() ) == 1
 
 
@@ -280,13 +280,18 @@ class solitaire(Problem):
     def path_cost(self, c: int, state1: sol_state, action: Move, state2: sol_state) -> float:
         return  cost_n_moves(c)  
 
-    def h(self, node):
-        node.state
+    def h(node : Node) -> float:
+        node.state.h_value = h_moves_to_goal(node)
+        return node.state.h_value
 
 #
 def cost_n_moves(prev_cost: int, weight: int = 1) -> int:
     """ 'g(n)' cost  function that adds a 'weight' to each move."""
     return prev_cost + weight
-#______________________________________________________________________________
-# aux functions
+
+
+def h_moves_to_goal(self, node: Node) -> float:
+    n_moves = len(node.state.moves)
+
+    return 0.7 * n_moves + 0.3
         
