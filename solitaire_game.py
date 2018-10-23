@@ -246,7 +246,7 @@ class sol_state:
         self.moves = board_moves(board)
         self.h_value = h_value
 
-    def __lt__(self, other_state: sol_state) -> bool:
+    def __lt__(self, other_state) -> bool:
         if self.h_value != other_state.h_value:
             return self.h_value < other_state.h_value
         
@@ -257,12 +257,12 @@ class sol_state:
 class solitaire(Problem):
 
     def __init__(self, board) -> None:
-        super().__init__(sg_state(board))
+        super().__init__(sol_state(board))
 
     """ Given a state returns a list of actions applicable to that state
     In this specific case the possible board_moves """
     def actions(self, state : sol_state) -> List[Move] :
-            return  [ move for move in state.moves if len(moves) >= 2]
+            return  state.moves if len(state.moves) >= 2 else []
 
     """ Given a state and an action returns the state resultant
     of applying the action to the intial state """
@@ -277,7 +277,7 @@ class solitaire(Problem):
 
     """ c-cost to this state / s1 - initial state
         s2 - final state  after action """
-    def path_cost(self, c: int, state1: sg_state, action: Move, state2: sol_state) -> float:
+    def path_cost(self, c: int, state1: sol_state, action: Move, state2: sol_state) -> float:
         return  cost_n_moves(c)  
 
     def h(self, node):
