@@ -8,7 +8,7 @@ Maxwell Junior - 79457
 """
 from typing import List, Tuple
 #________________________________________________________
-# Types Annotations 
+# Types Annotations
 
 Content = str
 Pos = Tuple[int, int]
@@ -31,7 +31,7 @@ def c_empty ():
     return "_"
 
 def is_empty (c: Content):
-    """ Returns True if an entry is false and False otherwise """   
+    """ Returns True if an entry is false and False otherwise """
     return c == c_empty()
 
 def c_blocked ():
@@ -89,7 +89,7 @@ def move_final(move: Move) -> Pos:
     return move[1]
 # _____________________________________________________________________________
 # TAI Board
-    
+
 def board_n_lines(board: Board) -> int:
     """Returns the number of lines of the board"""
     return len(board)
@@ -108,41 +108,41 @@ def board_create_deep_copy(board: Board) -> Board:
 def find_empty_pos(board: Board) -> Group :
     """ Return an list of empty content in board """
     group = []
-    
+
     for line in range(board_n_lines(board)):
         for column in range(board_n_columns(board)):
             curr_pos = make_pos(line, column)
             if(is_empty(get_content(board, curr_pos)) == True):
                 group.append(curr_pos)
     return group
-    
 
 
-def board_moves(board : Board) -> List[Move]: 
+
+def board_moves(board : Board) -> List[Move]:
     """ find all valid moves in the board """
-    
-    """ all the adjecent (Nort, South, East, Oest) positions, each adjecent position
+
+    """ all the adjecent (Nort, South, East, West) positions, each adjecent position
         have an inner and outer position. EX : "0,0,_" given the position (0,2), empty one,
         is South adjecent is : (0,1) the inner adj and (0,0) the outter adj;
     """
     adjs = [ [(-1,0) , (-2,0)], [(1,0),(2,0)],[(0,-1),(0,-2)],[(0,1) , (0,2)]]
-    
+
     def find_valid_move(board: Board, pos: Pos, adj: Adj) -> Move :
         "Giving an empty content and adj side find if is possible a valid move "
-        
+
         adj_inner  = pos_sum(pos, adj[0])
         adj_outter = pos_sum(pos, adj[1])
-        
+
         """ a move is valid if is inner and outter adjecent positions are valid and
-            have 'O' as content 
+            have 'O' as content
         """
         if ((pos_is_valid(adj_inner,board)  and is_peg(get_content(board,adj_inner))) and
             (pos_is_valid(adj_outter,board) and is_peg(get_content(board,adj_outter)))):
             return [adj_outter, pos]
-    
+
     moves = []
     empty_positions = find_empty_pos(board)
-    
+
     for empty_pos in empty_positions :
         for adj_pos in adjs:
             move = find_valid_move(board, empty_pos,adj_pos)
@@ -152,74 +152,101 @@ def board_moves(board : Board) -> List[Move]:
     return moves
 
 def  get_values_diff(val1: int, val2: int) -> int :
-      
+
       if val1 - val2  == 0 :
           return 0
       return val1 - 1 if val1 > val2 else val1 + 1
-  
-    
+
+
 def get_pos_intermediary(board: Board, pos1: Pos, pos2: Pos) -> Pos:
-    
+
     """ Get the position between the inicial position and the final position  """
-    
+
     pos1_line = pos_l(pos1)
     pos1_col  = pos_c(pos1)
-    
+
     pos2_line = pos_l(pos2)
     pos2_col  = pos_c(pos2)
-    
+
     """ The move its in the  """
     if get_values_diff(pos1_line, pos2_line) == 0 :
          return (pos1_line, get_values_diff(pos1_col, pos2_col))
-    
+
     if get_values_diff(pos1_col, pos2_col) == 0:
         return (get_values_diff(pos1_line, pos2_line),pos1_col)
-    
-    
+
+
 
 def board_perform_move(board: Board, move: Move) -> Board:
-          
-    def perform_move (board: Board, move: Move) -> Board :           
+
+    def perform_move (board: Board, move: Move) -> Board :
         pos_init  = move[0]
         pos_final = move[1]
-        
+
         """ Get the position between the inicial position and the final position  """
         pos_inter = get_pos_intermediary(board, pos_init, pos_final)
-    
+
         """ Set the new board configuration by applying the move to the board """
         set_content(board, pos_init, c_empty())
         set_content(board, pos_inter, c_empty())
         set_content(board, pos_final, c_peg())
-        
-        return board 
-    
+
+        return board
+
     """ Create a deep copy of the board """
     board_copy = board_create_deep_copy(board)
-    
+
     """ Check if the move in part of valid moves, if true, perform the move,
         otherwise, return the board copy"""
     if move in board_moves(board):
         return perform_move(board_copy, move)
-    
+
     else :
         return board_copy
-        
-    
-    
-    
-    
-    
-    
-    
-    
-    
 
 
 
-            
-    
-    
-    
-    
-        
 
+class Sol_State:
+
+    def __init__(self, board):
+        self.board = board
+
+    def __lt__(self, other):
+
+    def getBoard():
+        return self.board
+
+
+
+
+class Solitaire(Problem):
+
+    def __init__(self, board):
+        self.initial = Sol_State(board)
+
+    """ Given a state returns a list of actions applicable to that state
+    In this specific case the possible board_moves """
+    def actions(self, state):
+            return board_moves(state.getBoard())
+
+    """ Given a state and an action returns the state resultant
+    of applying the action to the intial state """
+    def result(self, state, action):
+        board = state.getBoard()
+        new_board = board_perform_move(board, action)
+        return Sol_State(new_board)
+
+    """ Verefies if state is a solution (nº of pieces in board = 1) """
+    def goal_test(self, state):
+        board = state.getBoard()
+        return(count_pieces(board)==1 )
+
+
+    """ c-cost to this state / s1 - initial state
+        s2 - final state  after action """
+    def path_cost(self, c , s1, action, s2):
+        return c+1
+
+    def h(self, node):
+        node.state
