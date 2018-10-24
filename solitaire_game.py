@@ -262,7 +262,7 @@ class solitaire(Problem):
     """ Given a state returns a list of actions applicable to that state
     In this specific case the possible board_moves """
     def actions(self, state : sol_state) -> List[Move] :
-            return  state.moves if len(state.moves) >= 2 else []
+            return  state.moves
 
     """ Given a state and an action returns the state resultant
     of applying the action to the intial state """
